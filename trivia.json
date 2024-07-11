@@ -1,0 +1,14 @@
+[
+    {
+        "question": "Is Doyle (Baker's Dog the best dog in the world? (answer is yes or no)",
+        "answer": "yes"
+    },
+    {
+        "question": "What is 4 times 6? (answer is a number)",
+        "answer": "24"
+    },
+    {
+        "question": "Earth has a population of over 8 billion people. (answer is true or false)",
+        "answer": "true"
+    }
+]

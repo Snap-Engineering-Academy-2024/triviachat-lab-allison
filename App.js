@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
+import trivia from "./trivia.json"
 
 const CHATBOT_USER_OBJ = {
   _id: 2,
@@ -9,12 +10,16 @@ const CHATBOT_USER_OBJ = {
 
 export default function App() {
   const [messages, setMessages] = useState([]);
+  const [questionCounter, setQuestionCounter] = useState(0);
+  const [userReady, setUserReady] = useState(false);
+  const [waiting, setWaiting] = useState(false);
+  const [score, setScore] = useState(1);
 
   useEffect(() => {
     if (messages.length < 1) {
       // Add a "starting message" when chat UI first loads
       addBotMessage(
-        "Hello, welcome to simple trivia! Say 'Yes' when you're ready to play!"
+        "Hello! Welcome to Allison's trivia chat bot! Say 'Go' when you're ready to play! 🧐"
       );
     }
   }, []);
@@ -40,8 +45,35 @@ export default function App() {
 
   const respondToUser = (userMessages) => {
     console.log("Recent user msg:", userMessages[0].text);
-
-    // addBotMessage("I am da response!");
+    if (!userReady && userMessages[0].text.toLowerCase() != 'go') { // user is not ready and has not said go
+      addBotMessage("No rush, say 'Go' when you are ready to start...");
+      return;
+    }
+    else if ((userReady && !waiting) || userMessages[0].text.toLowerCase() === 'go') { // user has said go to start the game or has said next to get the next question
+      if (userMessages[0].text.toLowerCase() != 'go') {
+        addBotMessage("Say 'Go' for the next question!")
+        return;
+      }
+      console.log(questionCounter)
+      setUserReady(true);
+      addBotMessage(`Question ${questionCounter + 1}: ${trivia[questionCounter].question}`);
+      setWaiting(true);
+    }
+    else if (waiting) { // waitng for user's answer user's answer
+      if (userMessages[0].text.toLowerCase() === trivia[questionCounter].answer || userMessages[0].text === trivia[questionCounter].answer) {
+        addBotMessage("Correct! 😎✅");
+      } else {
+        addBotMessage("Incorrect... 😭❌ Try again.");
+        return;
+      }
+      setQuestionCounter(questionCounter + 1)
+      if (questionCounter + 1 == trivia.length) {
+        addBotMessage("No more questions! Thanks for playing Allison's trivia chat bot! 🫶")
+        return;
+      }
+      setWaiting(false)
+      addBotMessage("Say 'Go' for the next question!")
+    }
   };
 
   const onSend = useCallback((messages = []) => {
